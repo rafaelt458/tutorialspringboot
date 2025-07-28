@@ -1,0 +1,230 @@
+openapi: '3.0.0'
+info:
+  title: Mi API de empleados
+  description: Api de ejemplo que demuestra un CRUD de empleados
+  version: 1.0.0
+servers:
+  - url: http://localhost:8090/api
+paths:
+  /empleados:
+    get:
+      tags:
+        - Empleado
+      operationId: getAllEmpleados
+      summary: Obtener todos los empleados
+      description: Retorna una lista de todos los empleados registrados en el sistema
+      responses:
+        '200':
+          description: Lista de empleados obtenida existosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmpleadoResponse'
+        '204':
+          description: Lista de empleados vacía
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmpleadoResponse'
+        '500':
+          description: Error interno en el servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: Error inesperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Empleado
+      operationId: saveEmpleado
+      summary: Crear un nuevo empleado
+      description: Agrega un nuevo empleado a la base de datos del sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmpleadoRequest'
+      responses:
+        '201':
+          description: Empleado creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmpleadoResponse'
+        '400':
+          description: Datos de entrada del empleado incorrectos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Error interno en el servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: Error inesperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /empleados/buscar:
+    get:
+      tags:
+        - Empleado
+      operationId: searchEmpleado
+      summary: Buscar empleados por departamento y años de antigüedad
+      description: Retorna una lista de empleados que coinciden con el departamento y la antigüedad especificados.
+      parameters:
+        - name: departamento
+          in: query
+          description: Nombre del departamento para buscar empleados
+          required: true
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 50
+            pattern: '^[a-zA-Z](?:[a-zA-Z]|(?<![- ])[- ](?![- ]))*[a-zA-Z]$'
+        - name: antiguedad
+          in: query
+          description: Años de antigüedad para buscar empleados
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 50
+      responses:
+        '200':
+          description: Lista de empleados obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmpleadoResponse'
+        '204':
+          description: No se encontraron empleados con los criterios especificados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmpleadoResponse'
+        '400':
+          description: Parámetros de búsqueda inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Error interno en el servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: Error inesperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    EmpleadoResponse:
+      type: object
+      required:
+        - id
+        - nombre
+        - apellido
+        - departamento
+        - fechaNacimiento
+        - salario
+        - antiguedad
+      properties:
+        id:
+          type: integer
+          description: identificador único del empleado
+          readOnly: true
+        nombre:
+          type: string
+          description: nombres del empleado
+        apellido:
+          type: string
+          description: apellidos del empleado
+        departamento:
+          type: string
+          description: departamento al que pertenece el empleado
+        fechaNacimiento:
+          type: string
+          format: date
+          description: fecha de nacimiento del empleado (AAAA-MM-DD)
+        salario:
+          type: number
+          format: double
+          description: salario anual del empleado
+        antiguedad:
+          type: integer
+          description: años de servicio del empleado
+
+    EmpleadoRequest:
+      type: object
+      required:
+        - nombre
+        - apellido
+        - departamento
+        - fechaNacimiento
+        - salario
+      properties:
+        nombre:
+          type: string
+          minLength: 3
+          maxLength: 30
+          pattern: '^[a-zA-Z](?:[a-zA-Z]|(?<![- ])[- ](?![- ]))*[a-zA-Z]$'
+          description: nombres del empleado
+        apellido:
+          type: string
+          minLength: 3
+          maxLength: 30
+          pattern: '^[a-zA-Z](?:[a-zA-Z]|(?<![- ])[- ](?![- ]))*[a-zA-Z]$'
+          description: apellidos del empleado
+        departamento:
+          type: string
+          minLength: 3
+          maxLength: 50
+          pattern: '^[a-zA-Z](?:[a-zA-Z]|(?<![- ])[- ](?![- ]))*[a-zA-Z]$'
+          description: departamento al que pertenece el empleado
+        fechaNacimiento:
+          type: string
+          format: date
+          description: fecha de nacimiento del empleado (AAAA-MM-DD)
+        salario:
+          type: number
+          format: double
+          minimum: 500
+          description: salario anual del empleado
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          description: código del error
+        message:
+          type: string
+          description: descripción del error
