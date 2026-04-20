@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "labrafa-mcp-server": {
+      "command": "java",
+      "args": [
+        "-jar",
+        "C:/Laboratorio/Tutoriales/SpringBoot/springboot70/target/springboot70-0.0.1-SNAPSHOT.jar"
+      ],
+      "trust": true
+    }
+  },
+  "security": {
+    "auth": {
+      "selectedType": "oauth-personal"
+    }
+  }
+}
