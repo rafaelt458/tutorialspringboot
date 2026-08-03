@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-make-not-null
+      author: labrafa
+      changes:
+        - addNotNullConstraint:
+            tableName: estudiantes
+            schemaName: dbo
+            columnName: tipo_documento_id
+            columnDataType: INT

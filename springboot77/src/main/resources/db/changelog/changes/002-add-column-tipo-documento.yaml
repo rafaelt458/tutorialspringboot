@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-add-column-tipo-documento
+      author: labrafa
+      changes:
+        - addColumn:
+            tableName: estudiantes
+            schemaName: dbo
+            columns:
+              - column:
+                  name: tipo_documento_id
+                  type: INT
+                  constraints:
+                    nullable: true   # temporalmente NULL
+
+        - addForeignKeyConstraint:
+            baseTableName: estudiantes
+            baseColumnNames: tipo_documento_id
+            referencedTableName: tipos_documento
+            referencedColumnNames: id
+            baseTableSchemaName: dbo
+            referencedTableSchemaName: dbo
+            constraintName: fk_estudiantes_tipos_documento

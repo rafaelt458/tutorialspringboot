@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-tipos-documento
+      author: labrafa
+      changes:
+        - createTable:
+            tableName: tipos_documento
+            schemaName: dbo
+            columns:
+              - column:
+                  name: id
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: codigo
+                  type: NVARCHAR(20)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: descripcion
+                  type: NVARCHAR(100)
+                  constraints:
+                    nullable: false
+
+        # Insertamos los tipos, incluyendo INDEFINIDO
+        - insert:
+            tableName: tipos_documento
+            columns:
+              - column: { name: codigo, value: "INDEFINIDO" }
+              - column: { name: descripcion, value: "No especificado" }
+
+        - insert:
+            tableName: tipos_documento
+            columns:
+              - column: { name: codigo, value: "DNI" }
+              - column: { name: descripcion, value: "Documento Nacional de Identidad" }
+
+        - insert:
+            tableName: tipos_documento
+            columns:
+              - column: { name: codigo, value: "TARJETA_RESIDENCIA" }
+              - column: { name: descripcion, value: "Tarjeta de residencia" }
+
+        - insert:
+            tableName: tipos_documento
+            columns:
+              - column: { name: codigo, value: "PASAPORTE" }
+              - column: { name: descripcion, value: "Pasaporte" }

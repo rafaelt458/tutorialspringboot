@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changes/001-create-tipos-documento.yaml
+  - include:
+      file: db/changelog/changes/002-add-column-tipo-documento.yaml
+  - include:
+      file: db/changelog/changes/003-set-default-existing.yaml
+  - include:
+      file: db/changelog/changes/004-make-not-null.yaml
+  - include:
+      file: db/changelog/changes/005-rename-dni.yaml

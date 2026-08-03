@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-set-default-existing
+      author: labrafa
+      changes:
+        - update:
+            tableName: estudiantes
+            schemaName: dbo
+            columns:
+              - column:
+                  name: tipo_documento_id
+                  valueComputed: "(SELECT id FROM tipos_documento WHERE codigo = 'INDEFINIDO')"

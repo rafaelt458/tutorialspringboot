@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-rename-dni
+      author: labrafa
+      changes:
+        - renameColumn:
+            tableName: estudiantes
+            schemaName: dbo
+            oldColumnName: dni
+            newColumnName: numero_documento
+            columnDataType: NVARCHAR(15)
