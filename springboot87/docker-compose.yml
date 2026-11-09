@@ -1,0 +1,94 @@
+services:
+  discovery-service:
+    build:
+      context: .
+      dockerfile: ./discovery-service/Dockerfile
+    container_name: discovery-service
+    ports:
+      - "${DISCOVERY_SERVICE_PORT}:8761"
+    networks:
+      - academia-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://discovery-service:${DISCOVERY_SERVICE_PORT}/actuator/health" ]
+      interval: 20s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+    restart: on-failure
+
+  estudiante-service:
+    build:
+      context: .
+      dockerfile: ./estudiante-service/Dockerfile
+    container_name: estudiante-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    ports:
+      - "0:8090"
+    environment:
+      - SERVER_PORT=8090
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
+    networks:
+      - academia-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8090/actuator/health" ]
+      interval: 20s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    restart: on-failure
+
+  curso-service:
+    build:
+      context: .
+      dockerfile: ./curso-service/Dockerfile
+    container_name: curso-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    ports:
+      - "0:8091"
+    environment:
+      - SERVER_PORT=8091
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
+    networks:
+      - academia-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8091/actuator/health" ]
+      interval: 20s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    restart: on-failure
+
+  matricula-service:
+    build:
+      context: .
+      dockerfile: ./matricula-service/Dockerfile
+    container_name: matricula-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      estudiante-service:
+        condition: service_healthy
+      curso-service:
+        condition: service_healthy
+    ports:
+      - "0:8092"
+    environment:
+      - SERVER_PORT=8092
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
+    networks:
+      - academia-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8092/actuator/health" ]
+      interval: 20s
+      timeout: 3s
+      retries: 5
+      start_period: 40s
+    restart: on-failure
+
+networks:
+  academia-network:
+    driver: bridge
