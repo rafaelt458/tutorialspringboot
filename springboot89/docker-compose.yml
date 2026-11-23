@@ -1,0 +1,156 @@
+services:
+  config-server:
+    build:
+      context: .
+      dockerfile: ./config-server/Dockerfile
+    container_name: config-server
+    ports:
+      - "${CONFIG_SERVER_PORT}:8888"
+    networks:
+      - academia-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:${CONFIG_SERVER_PORT}/actuator/health" ]
+      interval: 20s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+    restart: on-failure
+
+  discovery-service:
+    build:
+      context: .
+      dockerfile: ./discovery-service/Dockerfile
+    container_name: discovery-service
+    depends_on:
+      config-server:
+        condition: service_healthy
+    ports:
+      - "${DISCOVERY_SERVICE_PORT}:8761"
+    environment:
+      - CONFIG_SERVER_URL=${CONFIG_SERVER_URL}
+    networks:
+      - academia-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:${DISCOVERY_SERVICE_PORT}/actuator/health" ]
+      interval: 20s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+    restart: on-failure
+
+  gateway-service:
+    build:
+      context: .
+      dockerfile: ./gateway-service/Dockerfile
+    container_name: gateway-service
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+    ports:
+      - "${GATEWAY_SERVICE_PORT}:8081"
+    environment:
+      - CONFIG_SERVER_URL=${CONFIG_SERVER_URL}
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
+    networks:
+      - academia-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:${GATEWAY_SERVICE_PORT}/actuator/health" ]
+      interval: 20s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    restart: on-failure
+
+  estudiante-service:
+    build:
+      context: .
+      dockerfile: ./estudiante-service/Dockerfile
+    container_name: estudiante-service
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+    ports:
+      - "0:8090"
+    environment:
+      - CONFIG_SERVER_URL=${CONFIG_SERVER_URL}
+      - SERVER_PORT=8090
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
+    networks:
+      - academia-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8090/actuator/health" ]
+      interval: 20s
+      timeout: 3s
+      retries: 5
+      start_period: 40s
+    restart: on-failure
+
+  curso-service:
+    build:
+      context: .
+      dockerfile: ./curso-service/Dockerfile
+    container_name: curso-service
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+    ports:
+      - "0:8091"
+    environment:
+      - CONFIG_SERVER_URL=${CONFIG_SERVER_URL}
+      - SERVER_PORT=8091
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
+    networks:
+      - academia-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8091/actuator/health" ]
+      interval: 20s
+      timeout: 3s
+      retries: 5
+      start_period: 40s
+    restart: on-failure
+
+  matricula-service:
+    build:
+      context: .
+      dockerfile: ./matricula-service/Dockerfile
+    container_name: matricula-service
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+      estudiante-service:
+        condition: service_healthy
+      curso-service:
+        condition: service_healthy
+    ports:
+      - "0:8092"
+    environment:
+      - CONFIG_SERVER_URL=${CONFIG_SERVER_URL}
+      - SERVER_PORT=8092
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
+    networks:
+      - academia-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8092/actuator/health" ]
+      interval: 20s
+      timeout: 3s
+      retries: 5
+      start_period: 50s
+    restart: on-failure
+
+networks:
+  academia-network:
+    driver: bridge

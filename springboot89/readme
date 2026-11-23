@@ -1,0 +1,10 @@
+# Ver todos los contenedores con sus puertos mapeados
+docker ps
+
+# Ver solo tu compose
+docker compose ps
+
+# Ver el mapeo específico de un servicio
+docker port estudiante-service
+docker port curso-service
+docker port matricula-service
